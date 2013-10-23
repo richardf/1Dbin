@@ -1,5 +1,7 @@
 
 class ORLibraryInstanceReader(object):
+    """Class that knows how to load the ORLibrary instances for the 1-D bin
+    packing instances"""
 
     @classmethod
     def _get_instance_definition(cls, line):
@@ -10,14 +12,12 @@ class ORLibraryInstanceReader(object):
 
     @classmethod
     def _get_number_of_instances(cls, data):
+        """Returns the number of instances in the data file"""
         return int(data[0])
     
     @classmethod
-    def _load_instance(cls, file):
-        pass
-    
-    @classmethod
     def get_instances(cls, file):
+        """Returns a Instance of objects with the instances found in file param"""
         file_data = cls._read_file(file)
         number_of_instances = cls._get_number_of_instances(file_data)
         instance_name = file_data[1].strip()
@@ -37,8 +37,10 @@ class ORLibraryInstanceReader(object):
         input_file.close()
         return data
 
-    
+
 class Instance(object):
+    """Class that represents an 1-D bin packing problem instance"""
+    
     def __init__(self, instance_name, bin_cap, n_itens, objects, best_sol):
         self.instance_name = instance_name
         self.bin_capacity = bin_cap
