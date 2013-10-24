@@ -27,7 +27,7 @@ class ORLibraryInstanceReader(object):
         for line in file_data[3:]:
             objects.append(int(line))
             
-        return Instance(instance_name, bin_cap, n_itens, objects, best_sol)
+        return Instance(instance_name, bin_cap, objects, best_sol)
     
     @classmethod
     def _read_file(cls, file):
@@ -41,9 +41,10 @@ class ORLibraryInstanceReader(object):
 class Instance(object):
     """Class that represents an 1-D bin packing problem instance"""
     
-    def __init__(self, instance_name, bin_cap, n_itens, objects, best_sol):
+    def __init__(self, instance_name, bin_cap, objects, best_sol):
         self.instance_name = instance_name
         self.bin_capacity = bin_cap
-        self.n_itens = n_itens
         self.objects = objects
         self.best_known_sol = best_sol
+
+

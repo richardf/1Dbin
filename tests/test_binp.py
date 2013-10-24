@@ -36,6 +36,15 @@ class ORLibraryInstanceReaderTest(unittest.TestCase):
         self.assertIsInstance(ret, Instance)
         self.assertEqual("inst_01", ret.instance_name)
         self.assertEqual(90, ret.bin_capacity)
-        self.assertEqual(3, ret.n_itens)
         self.assertEqual(2, ret.best_known_sol)
         self.assertEqual([42, 69, 30], ret.objects)
+
+
+class InstanceTest(unittest.TestCase):
+    
+    def test_Instance_object_should_receive_data_in_init_method(self):
+        inst = Instance("name", 100, [30, 20], 1)
+        self.assertIsInstance(inst, Instance)
+        self.assertEqual("name", inst.instance_name)
+        self.assertEqual(100, inst.bin_capacity)
+        self.assertEqual([30, 20], inst.objects)
