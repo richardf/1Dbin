@@ -76,12 +76,42 @@ class FirstFitConstructor(Constructor):
 class Solution(object):
     """A solution for the bin packing problem."""
     
-    def __init__(self, size=1):
+    def __init__(self, box_size, size=1):
         if size <= 0:
             raise ValueError("The solution size should be greater than zero.")
             
-        self.sol = [0] * size
+        self.weights = [0] * size
+        self.box_size = box_size
         self.boxes = {}
 
-    def add_object(obj, weight, box):
-        pass
+    def add_object(self, obj, weight, box):
+        """Adds an object obj with a weight in a given box, if possible.
+        Returns true if added, false otherwise."""
+        self._validate(obj, weight, box)
+        
+        if self._has_space_box(box, weight):
+            if not box in self.boxes:
+                self.boxes[box] = []
+                
+            self.boxes[box].append(obj)
+            self.weights[obj] = weight
+            return True
+        return False
+
+    def _has_space_box(self, box, weight):
+        """True if the box can hold a given weight"""
+        used_weight = 0
+        
+        if box in self.boxes:
+            for obj in self.boxes[box]:
+                used_weight = used_weight + self.weights[obj]
+        
+        free_weight = self.box_size - used_weight
+        if free_weight >= weight:
+            return True
+        return False
+        
+    def _validate(self, obj, weight, box):
+        """Validate the object, weight and box parameters"""
+        if obj < 0 or weight <=0 or box < 0:
+            raise ValueError("Invalid data passed as argument.")

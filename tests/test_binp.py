@@ -66,11 +66,90 @@ class InstanceTest(unittest.TestCase):
 
 
 class SolutionTest(unittest.TestCase):
-    def test_solution_of_size_3_should_have_sol_with_zeros(self):
-        solution = Solution(3)
-        self.assertEqual(3, len(solution.sol))
-        self.assertEqual([0, 0, 0], solution.sol)
+    def test_solution_of_size_3_should_have_weights_with_zeros(self):
+        solution = Solution(1, 3)
+        self.assertEqual(3, len(solution.weights))
+        self.assertEqual([0, 0, 0], solution.weights)
         
     def test_solution_of_invalid_size_should_raise_error(self):
         with self.assertRaises(ValueError):
-            solution = Solution(-1)
+            solution = Solution(1, -1)
+
+    def test_has_space_box_with_weight_bigger_than_box_should_return_false(self):
+        solution = Solution(5, 2)
+        self.assertFalse(solution._has_space_box(0, 10))
+    
+    def test_has_space_box_with_weight_smaller_than_box_should_return_true(self):
+        solution = Solution(5, 2)
+        self.assertTrue(solution._has_space_box(0, 4))
+        
+    def test_add_solution_with_weight_bigger_than_box_size_should_return_false(self):
+        solution = Solution(5, 2)
+        self.assertFalse(solution.add_object(0, 10, 0))
+        
+    def test_add_solution_with_weight_smaller_than_box_size_should_return_true(self):
+        solution = Solution(5, 2)
+        self.assertTrue(solution.add_object(0, 3, 0))        
+        
+    def test_add_solution_with_invalid_object_should_raise_error(self):
+        solution = Solution(5, 2)
+        with self.assertRaises(ValueError):
+            solution.add_object(-1, 3, 0)
+            
+    def test_add_solution_with_invalid_object_size_should_raise_error(self):
+        solution = Solution(5, 2)
+        with self.assertRaises(ValueError):
+            solution.add_object(0, -3, 0)            
+            
+    def test_add_solution_with_invalid_box_should_raise_error(self):
+        solution = Solution(5, 2)
+        with self.assertRaises(ValueError):
+            solution.add_object(0, 3, -1)                        
+
+    def test_add_solution_in_a_full_box_should_return_false(self):
+        solution = Solution(5, 2)
+        solution.add_object(0, 5, 0)
+        self.assertFalse(solution.add_object(0, 3, 0))
+
+    def test_add_solution_in_a_box_that_can_hold_it_should_return_true(self):
+        solution = Solution(5, 2)
+        solution.add_object(0, 3, 0)
+        self.assertTrue(solution.add_object(0, 2, 0))
+
+    def test_boxes_dict_should_have_one_box_with_one_object(self):
+        solution = Solution(5, 2)
+        solution.add_object(0, 3, 0)
+        self.assertEqual(1, len(solution.boxes))
+        self.assertEqual(1, len(solution.boxes[0]))
+        self.assertEqual(0, solution.boxes[0][0])
+        
+    def test_boxes_dict_should_have_two_boxes_with_one_object_each(self):
+        solution = Solution(5, 2)
+        solution.add_object(1, 3, 0)
+        solution.add_object(0, 3, 1)
+        self.assertEqual(2, len(solution.boxes))
+        self.assertEqual(1, len(solution.boxes[0]))
+        self.assertEqual(1, solution.boxes[0][0])        
+        self.assertEqual(1, len(solution.boxes[1]))
+        self.assertEqual(0, solution.boxes[1][0])        
+        
+    def test_boxes_dict_should_have_one_box_with_two_objects(self):
+        solution = Solution(5, 2)
+        solution.add_object(0, 3, 0)
+        solution.add_object(1, 2, 0)
+        self.assertEqual(1, len(solution.boxes))
+        self.assertEqual(0, solution.boxes[0][0])
+        self.assertEqual(2, len(solution.boxes[0]))
+        self.assertEqual(1, solution.boxes[0][1])
+
+    def test_weights_list_should_have_one_element_with_weight_3(self):
+        solution = Solution(5, 2)
+        solution.add_object(0, 3, 0)
+        self.assertEqual(3, solution.weights[0])
+        
+    def test_weights_list_should_have_two_elements_with_weights_3_and_2(self):
+        solution = Solution(5, 2)
+        solution.add_object(0, 3, 0)
+        solution.add_object(1, 2, 0)
+        self.assertEqual(3, solution.weights[0])
+        self.assertEqual(2, solution.weights[1])
