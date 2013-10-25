@@ -10,7 +10,7 @@ class ORLibraryInstanceReader(object):
         
         instances = []
         idx = 1
-        for x in xrange(0, number_of_instances):
+        for x in range(0, number_of_instances):
             instance_name = file_data[idx].strip()
             bin_cap, n_itens, best_sol = cls._get_instance_definition(file_data[idx+1])
             
