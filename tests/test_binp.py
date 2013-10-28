@@ -77,18 +77,20 @@ class SolutionTest(unittest.TestCase):
 
     def test_has_space_box_with_weight_bigger_than_box_should_return_false(self):
         solution = Solution(5, 2)
-        self.assertFalse(solution._has_space_box(0, 10))
+        self.assertFalse(solution.has_space_box(0, 10))
     
     def test_has_space_box_with_weight_smaller_than_box_should_return_true(self):
         solution = Solution(5, 2)
-        self.assertTrue(solution._has_space_box(0, 4))
+        self.assertTrue(solution.has_space_box(0, 4))
         
     def test_add_solution_with_weight_bigger_than_box_size_should_return_false(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
         self.assertFalse(solution.add_object(0, 10, 0))
         
     def test_add_solution_with_weight_smaller_than_box_size_should_return_true(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
         self.assertTrue(solution.add_object(0, 3, 0))        
         
     def test_add_solution_with_invalid_object_should_raise_error(self):
@@ -113,11 +115,13 @@ class SolutionTest(unittest.TestCase):
 
     def test_add_solution_in_a_box_that_can_hold_it_should_return_true(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
         solution.add_object(0, 3, 0)
         self.assertTrue(solution.add_object(0, 2, 0))
 
     def test_boxes_dict_should_have_one_box_with_one_object(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
         solution.add_object(0, 3, 0)
         self.assertEqual(1, len(solution.boxes))
         self.assertEqual(1, len(solution.boxes[0]))
@@ -125,6 +129,8 @@ class SolutionTest(unittest.TestCase):
         
     def test_boxes_dict_should_have_two_boxes_with_one_object_each(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
+        solution.boxes[1] = []
         solution.add_object(1, 3, 0)
         solution.add_object(0, 3, 1)
         self.assertEqual(2, len(solution.boxes))
@@ -135,6 +141,7 @@ class SolutionTest(unittest.TestCase):
         
     def test_boxes_dict_should_have_one_box_with_two_objects(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
         solution.add_object(0, 3, 0)
         solution.add_object(1, 2, 0)
         self.assertEqual(1, len(solution.boxes))
@@ -144,12 +151,58 @@ class SolutionTest(unittest.TestCase):
 
     def test_weights_list_should_have_one_element_with_weight_3(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
         solution.add_object(0, 3, 0)
         self.assertEqual(3, solution.weights[0])
         
     def test_weights_list_should_have_two_elements_with_weights_3_and_2(self):
         solution = Solution(5, 2)
+        solution.boxes[0] = []
+        solution.boxes[1] = []
         solution.add_object(0, 3, 0)
         solution.add_object(1, 2, 0)
         self.assertEqual(3, solution.weights[0])
         self.assertEqual(2, solution.weights[1])
+        
+    def test_create_box_with_an_empty_solution_should_return_box_0(self):
+        solution = Solution(5, 2)
+        self.assertEqual(0, solution.create_box())
+        self.assertEqual(1, len(solution.boxes))
+
+    def test_create_box_with_an_solution__with_one_box_should_return_box_1(self):
+        solution = Solution(5, 2)
+        solution.boxes[0] = []
+        self.assertEqual(1, solution.create_box())
+        self.assertEqual(2, len(solution.boxes))       
+
+
+class FirstFitConstructorTest(unittest.TestCase):
+    def test_find_box_that_fits_5_with_empty_solution_should_return_box_0(self):
+        instance =  Instance("inst_name", 20, [5, 10, 15, 20], 3)
+        solution = Solution(10, 4)
+        constructor = FirstFitConstructor(instance)
+        self.assertEqual(0, constructor._find_box_that_fits(5, solution))
+        
+    def test_find_box_that_fits_20_with_one_full_box_should_return_box_1(self):
+        instance =  Instance("inst_name", 20, [5, 10, 15, 20], 3)
+        solution = Solution(10, 4)
+        solution.boxes[0] = [0, 1, 2]
+        solution.weights = [5, 10, 15, 20]
+        constructor = FirstFitConstructor(instance)
+        self.assertEqual(1, constructor._find_box_that_fits(5, solution))
+        
+    def test_generate_solution_valid_should_return_a_solution(self):
+        instance =  Instance("inst_name", 10, [6, 10, 4, 5], 3)
+        constructor = FirstFitConstructor(instance)
+        solution = constructor.generate_solution()
+        self.assertIsInstance(solution, Solution)
+        self.assertEqual(3, len(solution.boxes))
+        self.assertEqual([0, 2], solution.boxes[0])
+        self.assertEqual([1], solution.boxes[1])
+        self.assertEqual([3], solution.boxes[2])
+        
+    def test_generate_solution_with_weight_bigger_than_box_capacity_should_raise_error(self):
+        instance =  Instance("inst_name", 5, [6, 10, 4, 5], 3)
+        constructor = FirstFitConstructor(instance)
+        with self.assertRaises(ValueError):
+            solution = constructor.generate_solution()

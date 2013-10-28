@@ -65,12 +65,23 @@ class Constructor(object):
 class FirstFitConstructor(Constructor):
     
     def generate_solution(self):
-        solution = Solution(len(instance.objects))
-        for obj, weight in enumerate(instance.objects):
-            box_number = self._find_box_that_fits(weight)
-            solution.add_object(obj, weight, box_number)
+        solution = Solution(self.instance.bin_capacity, len(self.instance.objects))
+        for obj, weight in enumerate(self.instance.objects):
+            box_number = self._find_box_that_fits(weight, solution)
+            isAdded = solution.add_object(obj, weight, box_number)
+            if not isAdded:
+                raise ValueError("Impossible to add object to box.")
             
         return solution
+    
+    def _find_box_that_fits(self, weight, solution):
+        """Return a box that have enough space to hold the given weight. 
+        If none, it opens a new box."""
+        for box_number, box in enumerate(solution.boxes):
+            if solution.has_space_box(box_number, weight):
+                return box_number
+            
+        return solution.create_box()
 
 
 class Solution(object):
@@ -89,16 +100,22 @@ class Solution(object):
         Returns true if added, false otherwise."""
         self._validate(obj, weight, box)
         
-        if self._has_space_box(box, weight):
+        if self.has_space_box(box, weight):
             if not box in self.boxes:
-                self.boxes[box] = []
+                return False
                 
             self.boxes[box].append(obj)
             self.weights[obj] = weight
             return True
         return False
+    
+    def create_box(self):
+        """Create a new box, returning its box number"""
+        next_box_number = len(self.boxes)
+        self.boxes[next_box_number] = []
+        return next_box_number
 
-    def _has_space_box(self, box, weight):
+    def has_space_box(self, box, weight):
         """True if the box can hold a given weight"""
         used_weight = 0
         
