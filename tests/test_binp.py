@@ -206,3 +206,10 @@ class FirstFitConstructorTest(unittest.TestCase):
         constructor = FirstFitConstructor(instance)
         with self.assertRaises(ValueError):
             solution = constructor.generate_solution()
+
+
+class DescendingFirstFitConstructorTest(unittest.TestCase):
+    def test_get_objects_in_order_should_return_ordered_list(self):
+        instance =  Instance("inst_name", 10, [6, 10, 4, 5], 3)
+        constructor = DescendingFirstFitConstructor(instance)
+        self.assertEqual([8, 5, 3, 1], constructor._get_objects_in_order([8, 1, 5, 3]))

@@ -63,10 +63,13 @@ class Constructor(object):
 
 
 class FirstFitConstructor(Constructor):
+    """Constructor algorithm that inserts each object in the first box that
+    can hold it."""
     
     def generate_solution(self):
+        """Generates a new solution for a given instance"""
         solution = Solution(self.instance.bin_capacity, len(self.instance.objects))
-        for obj, weight in enumerate(self.instance.objects):
+        for obj, weight in enumerate(self._get_objects_in_order(self.instance.objects)):
             box_number = self._find_box_that_fits(weight, solution)
             isAdded = solution.add_object(obj, weight, box_number)
             if not isAdded:
@@ -82,6 +85,19 @@ class FirstFitConstructor(Constructor):
                 return box_number
             
         return solution.create_box()
+    
+    def _get_objects_in_order(self, objects):
+        """Return the objects in the order that they need to be processed by
+        the algorithm."""
+        return objects
+
+
+class DescendingFirstFitConstructor(FirstFitConstructor):
+    """Constructor algorithm based on First Fit. It sorts the objects descending
+     by its weight prior to processing them."""
+    
+    def _get_objects_in_order(self, objects):
+        return sorted(objects, reverse=True)
 
 
 class Solution(object):
