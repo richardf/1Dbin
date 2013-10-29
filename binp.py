@@ -16,7 +16,7 @@ class ORLibraryInstanceReader(object):
             
             objects = []
             for line in file_data[idx+2:idx+2+n_itens]:
-                objects.append(int(line))
+                objects.append(float(line))
             
             inst = Instance(instance_name, bin_cap, objects, best_sol)
             instances.append(inst)
@@ -29,7 +29,7 @@ class ORLibraryInstanceReader(object):
         """It returns the bin capacity, number of itens in instance and the number of bins used 
         in the best known solution"""
         bin_capacity, number_of_itens, bins_in_best_sol = line.split()
-        return int(bin_capacity), int(number_of_itens), int(bins_in_best_sol)
+        return float(bin_capacity), int(number_of_itens), int(bins_in_best_sol)
 
     @classmethod
     def _get_number_of_instances(cls, data):
