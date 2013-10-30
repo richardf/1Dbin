@@ -61,11 +61,6 @@ class Constructor(object):
     def __init__(self, instance):
         self.instance = instance
 
-
-class FirstFitConstructor(Constructor):
-    """Constructor algorithm that inserts each object in the first box that
-    can hold it."""
-    
     def generate_solution(self):
         """Generates a new solution for a given instance"""
         solution = Solution(self.instance.bin_capacity, len(self.instance.objects))
@@ -76,6 +71,16 @@ class FirstFitConstructor(Constructor):
                 raise ValueError("Impossible to add object to box.")
             
         return solution
+
+    def _get_objects_in_order(self, objects):
+        """Return the objects in the order that they need to be processed by
+        the algorithm."""
+        return objects
+
+
+class FirstFitConstructor(Constructor):
+    """Constructor algorithm that inserts each object in the first box that
+    can hold it."""
     
     def _find_box_that_fits(self, weight, solution):
         """Return a box that have enough space to hold the given weight. 
@@ -85,11 +90,6 @@ class FirstFitConstructor(Constructor):
                 return box_number
             
         return solution.create_box()
-    
-    def _get_objects_in_order(self, objects):
-        """Return the objects in the order that they need to be processed by
-        the algorithm."""
-        return objects
 
 
 class DescendingFirstFitConstructor(FirstFitConstructor):
@@ -98,6 +98,27 @@ class DescendingFirstFitConstructor(FirstFitConstructor):
     
     def _get_objects_in_order(self, objects):
         return sorted(objects, reverse=True)
+
+
+class BestFitConstructor(Constructor):
+    """Constructor algorithm that searches for boxes that can store the object, and puts it
+    in the fullest one."""
+    
+    def _find_box_that_fits(self, weight, solution):
+        """Return a box that have enough space to hold the given weight. 
+        If none, it opens a new box."""
+        boxes_that_fit = {}
+        for box_number, box in enumerate(solution.boxes):
+            space_available = solution.amount_space_available_box(box_number)
+            if space_available >= weight:
+                if space_available not in boxes_that_fit:
+                    boxes_that_fit[space_available] = box_number
+
+        if(len(boxes_that_fit) == 0):
+            return solution.create_box()
+        else:
+            dict_key = sorted(boxes_that_fit.keys())[0]
+            return boxes_that_fit[dict_key]
 
 
 class Solution(object):
@@ -133,6 +154,13 @@ class Solution(object):
 
     def has_space_box(self, box, weight):
         """True if the box can hold a given weight"""
+        free_weight = self.amount_space_available_box(box)
+        if free_weight >= weight:
+            return True
+        return False
+    
+    def amount_space_available_box(self, box):
+        """Returns the amount of space available in a given box."""
         used_weight = 0
         
         if box in self.boxes:
@@ -140,10 +168,8 @@ class Solution(object):
                 used_weight = used_weight + self.weights[obj]
         
         free_weight = self.box_size - used_weight
-        if free_weight >= weight:
-            return True
-        return False
-        
+        return free_weight
+
     def _validate(self, obj, weight, box):
         """Validate the object, weight and box parameters"""
         if obj < 0 or weight <=0 or box < 0:

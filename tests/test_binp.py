@@ -82,6 +82,12 @@ class SolutionTest(unittest.TestCase):
     def test_has_space_box_with_weight_smaller_than_box_should_return_true(self):
         solution = Solution(5, 2)
         self.assertTrue(solution.has_space_box(0, 4))
+
+    def test_has_space_box_with_weight_smaller_than_space_available_in_box_should_return_false(self):
+        solution = Solution(5, 2)
+        solution.create_box()
+        solution.add_object(0, 3, 0)
+        self.assertFalse(solution.has_space_box(0, 4))
         
     def test_add_solution_with_weight_bigger_than_box_size_should_return_false(self):
         solution = Solution(5, 2)
@@ -173,9 +179,26 @@ class SolutionTest(unittest.TestCase):
         solution = Solution(5, 2)
         solution.boxes[0] = []
         self.assertEqual(1, solution.create_box())
-        self.assertEqual(2, len(solution.boxes))       
+        self.assertEqual(2, len(solution.boxes))
 
+    def test_amount_space_available_box_with_full_box_should_return_0(self):
+        solution = Solution(5, 2)
+        solution.boxes[0] = [0]
+        solution.weights[0] = 5
+        self.assertEqual(0, solution.amount_space_available_box(0))
 
+    def test_amount_space_available_box_with_empty_box_should_return_box_capacity(self):
+        solution = Solution(5, 2)
+        solution.boxes[0] = []
+        self.assertEqual(5, solution.amount_space_available_box(0))
+
+    def test_amount_space_available_box_with_box_space_equal_3_should_return_3(self):
+        solution = Solution(5, 2)
+        solution.boxes[0] = [0]
+        solution.weights[0] = 2
+        self.assertEqual(3, solution.amount_space_available_box(0))
+
+        
 class FirstFitConstructorTest(unittest.TestCase):
     def test_find_box_that_fits_5_with_empty_solution_should_return_box_0(self):
         instance =  Instance("inst_name", 20, [5, 10, 15, 20], 3)
@@ -213,3 +236,44 @@ class DescendingFirstFitConstructorTest(unittest.TestCase):
         instance =  Instance("inst_name", 10, [6, 10, 4, 5], 3)
         constructor = DescendingFirstFitConstructor(instance)
         self.assertEqual([8, 5, 3, 1], constructor._get_objects_in_order([8, 1, 5, 3]))
+
+
+class BestFitConstructorTest(unittest.TestCase):
+    def test_find_box_that_fits_5_with_empty_solution_should_return_box_0(self):
+        instance =  Instance("inst_name", 20, [5, 10, 15, 20], 3)
+        solution = Solution(20, 4)
+        constructor = BestFitConstructor(instance)
+        self.assertEqual(0, constructor._find_box_that_fits(5, solution))
+        
+    def test_find_box_that_fits_5_with_one_full_box_should_return_box_1(self):
+        instance =  Instance("inst_name", 20, [5, 10, 15, 20], 3)
+        solution = Solution(20, 4)
+        solution.boxes[0] = [3]
+        solution.weights = [5, 10, 15, 20]
+        constructor = BestFitConstructor(instance)
+        self.assertEqual(1, constructor._find_box_that_fits(5, solution))
+        
+    def test_find_box_that_fits_5_with_two_boxes_that_fits_should_return_fullst_box(self):
+        instance =  Instance("inst_name", 20, [5, 10, 15, 20], 3)
+        solution = Solution(20, 4)
+        solution.boxes[0] = [3]
+        solution.boxes[1] = [0]
+        solution.boxes[2] = [2]
+        solution.weights = [5, 10, 15, 20]
+        constructor = BestFitConstructor(instance)
+        self.assertEqual(2, constructor._find_box_that_fits(5, solution))
+        
+    def test_generate_solution_valid_should_return_a_solution(self):
+        instance =  Instance("inst_name", 10, [5, 6, 4, 5], 2)
+        constructor = BestFitConstructor(instance)
+        solution = constructor.generate_solution()
+        self.assertIsInstance(solution, Solution)
+        self.assertEqual(2, len(solution.boxes))
+        self.assertEqual([0, 3], solution.boxes[0])
+        self.assertEqual([1, 2], solution.boxes[1])
+        
+    def test_generate_solution_with_weight_bigger_than_box_capacity_should_raise_error(self):
+        instance =  Instance("inst_name", 5, [6, 10, 4, 5], 3)
+        constructor = BestFitConstructor(instance)
+        with self.assertRaises(ValueError):
+            solution = constructor.generate_solution()        

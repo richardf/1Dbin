@@ -28,11 +28,19 @@ def execute_exp():
     for instance_file in INSTANCE_FILES:
         instances = ORLibraryInstanceReader.get_instances(os.path.join(INSTANCE_PATH, instance_file))
         run_first_fit_with(instances)
+        run_descending_first_fit_with(instances)
 
 def run_first_fit_with(instances):
     """Execution of each instance with First Fit algorithm"""
     for instance in instances:
         constructor = FirstFitConstructor(instance)
+        time_elapsed, solution = solve_instance(constructor)
+        print(generate_result_string(instance, solution, time_elapsed))
+
+def run_descending_first_fit_with(instances):
+    """Execution of each instance with Descending First Fit algorithm"""
+    for instance in instances:
+        constructor = DescendingFirstFitConstructor(instance)
         time_elapsed, solution = solve_instance(constructor)
         print(generate_result_string(instance, solution, time_elapsed))
 
