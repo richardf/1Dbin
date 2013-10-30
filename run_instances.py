@@ -11,6 +11,9 @@ INSTANCE_FILES = ["binpack1.txt", "binpack2.txt", "binpack3.txt"
                   ,"binpack4.txt", "binpack5.txt", "binpack6.txt"
                   ,"binpack7.txt", "binpack8.txt"]
 
+CONSTRUCTOR_ALGORITHMS = ["FirstFitConstructor", "DescendingFirstFitConstructor"
+                          ,"BestFitConstructor", "DescendingBestFitConstructor"]
+
 def timed(f):
     """This function is used as a decorator to measure time spent by each algorithm"""
     @functools.wraps(f)
@@ -27,20 +30,15 @@ def execute_exp():
     all implemented algorithms"""
     for instance_file in INSTANCE_FILES:
         instances = ORLibraryInstanceReader.get_instances(os.path.join(INSTANCE_PATH, instance_file))
-        run_first_fit_with(instances)
-        run_descending_first_fit_with(instances)
+        for constructor_name in CONSTRUCTOR_ALGORITHMS:
+            run_algorithm(constructor_name, instances)
 
-def run_first_fit_with(instances):
-    """Execution of each instance with First Fit algorithm"""
+def run_algorithm(algorithm, instances):
+    """Executes the algorithm for the given instances. The algorithm parameter should be the class 
+    name that implements the algorithm."""
+    print(algorithm)
     for instance in instances:
-        constructor = FirstFitConstructor(instance)
-        time_elapsed, solution = solve_instance(constructor)
-        print(generate_result_string(instance, solution, time_elapsed))
-
-def run_descending_first_fit_with(instances):
-    """Execution of each instance with Descending First Fit algorithm"""
-    for instance in instances:
-        constructor = DescendingFirstFitConstructor(instance)
+        constructor = globals()[algorithm](instance)
         time_elapsed, solution = solve_instance(constructor)
         print(generate_result_string(instance, solution, time_elapsed))
 
