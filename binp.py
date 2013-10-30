@@ -121,6 +121,14 @@ class BestFitConstructor(Constructor):
             return boxes_that_fit[dict_key]
 
 
+class DescendingBestFitConstructor(BestFitConstructor):
+    """Constructor algorithm based on Best Fit. It sorts the objects descending
+     by its weight prior to processing them."""
+    
+    def _get_objects_in_order(self, objects):
+        return sorted(objects, reverse=True)
+
+
 class Solution(object):
     """A solution for the bin packing problem."""
     
